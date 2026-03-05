@@ -1,16 +1,30 @@
-import qr from "qrcode-terminal";
-import chalk from "chalk";
+import qrcode from "qrcode-terminal";
+import { saveQRCode } from "./save.js";
+import { saveHistory } from "../history/history.js";
 
 export async function handleQrCode(err, result) {
   if (err) {
-    console.log("error on application.");
+    console.log("Erro ao gerar QRCode", err);
     return;
   }
 
-  const isSmall = result.type === 2;
+  const { link, type } = result;
+  const typeOption = Number(type);
 
-  qr.generate(result.link, { small: isSmall }, (qrcode) => {
-    console.log(chalk.green("QRCode gerado com sucesso!"));
-    console.log(qrcode);
+  if (typeOption === 2) {
+    qrcode.generate(link, { small: true });
+    return;
+  }
+
+  const filePath = await saveQRCode(link);
+
+  if (!filePath) return;
+
+  saveHistory({
+    link,
+    file: filePath,
+    createdAt: new Date().toISOString(),
   });
+
+  console.log("QRCode salvo em: ", filePath);
 }
