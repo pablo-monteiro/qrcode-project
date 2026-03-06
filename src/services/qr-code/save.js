@@ -13,11 +13,12 @@ export async function saveQRCode(link) {
     const url = new URL(link);
     const domain = url.hostname.replace(/\./g, "-");
     const timestamp = Date.now();
-    const filePath = path.join(folder, `qrcode-${domain}-${timestamp}.png`);
+    const fileName = `qrcode-${domain}-${timestamp}.png`;
+    const filePath = path.join(folder, fileName);
 
     await QRCode.toFile(filePath, link);
 
-    return filePath;
+    return fileName;
   } catch (error) {
     console.log("Erro ao salvar QRCode:", error);
   }
